@@ -13,6 +13,7 @@ public class Library {
     public static final String DELIMITER = "±";
     public static final String AUTH_REQUEST = "/auth_request";
     public static final String AUTH_ACCEPT = "/auth_accept";
+    public static final String EDIT_NICK = "/edit_nick";
     public static final String AUTH_DENIED = "/auth_denied";
     public static final String MSG_FORMAT_ERROR = "/msg_format_error"; // если мы вдруг не поняли, что за сообщение и не смогли разобрать
     public static final String TYPE_BROADCAST = "/bcast"; // то есть сообщение, которое будет посылаться всем
@@ -21,6 +22,10 @@ public class Library {
 
     public static String getTypeBcastClient(String msg) {
         return CLIENT_MSG_BROADCAST + DELIMITER + msg;
+    }
+
+    public static String getEditNickClient(String msg) {
+        return EDIT_NICK + DELIMITER + msg;
     }
 
     public static String getAuthRequest(String login, String password) {

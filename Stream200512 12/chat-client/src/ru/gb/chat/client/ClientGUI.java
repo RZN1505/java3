@@ -134,7 +134,7 @@ public class ClientGUI extends JFrame implements ActionListener, Thread.Uncaught
         String msgNick = nickNameMessage.getText();
         if ("".equals(msgNick)) return;
         nickNameMessage.setText(null);
-        socketThread.sendMessage(Library.getTypeBcastClient(msgNick));
+        socketThread.sendMessageNick(Library.getEditNickClient(msgNick));
     }
 
     private void wrtMsgToLogFile(String msg, String username) {
@@ -221,6 +221,13 @@ public class ClientGUI extends JFrame implements ActionListener, Thread.Uncaught
             case Library.AUTH_DENIED:
                 putLog("Wrong login/password");
                 break;
+            case Library.EDIT_NICK:
+                putLog("Edit nick");
+                String users = msg.substring(Library.USER_LIST.length() + Library.DELIMITER.length());
+                String[] usersArr = users.split(Library.DELIMITER);
+                Arrays.sort(usersArr);
+                userList.setListData(usersArr);
+                break;
             case Library.MSG_FORMAT_ERROR:
                 putLog(msg);
                 socketThread.close();
@@ -229,10 +236,10 @@ public class ClientGUI extends JFrame implements ActionListener, Thread.Uncaught
                 putLog(DATE_FORMAT.format(Long.parseLong(arr[1])) + ": " + arr[2] + ": " + arr[3] + "\n");
                 break;
             case Library.USER_LIST:
-                String users = msg.substring(Library.USER_LIST.length() + Library.DELIMITER.length());
-                String[] usersArr = users.split(Library.DELIMITER);
-                Arrays.sort(usersArr);
-                userList.setListData(usersArr);
+                String usersGet = msg.substring(Library.USER_LIST.length() + Library.DELIMITER.length());
+                String[] usersArrGet = usersGet.split(Library.DELIMITER);
+                Arrays.sort(usersArrGet);
+                userList.setListData(usersArrGet);
                 break;
             default:
                 throw new RuntimeException("Unknown message type: " + msg);

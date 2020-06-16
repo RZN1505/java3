@@ -37,7 +37,7 @@ public class SocketThread extends Thread {
         }
     }
 
-    public boolean sendMessage(String msg) {
+    public boolean sendMessageNick(String msg) {
         try {
             out.writeUTF(msg);
             out.flush();
@@ -49,6 +49,17 @@ public class SocketThread extends Thread {
         }
     }
 
+    public boolean sendMessage(String msg) {
+        try {
+            out.writeUTF(msg);
+            out.flush();
+            return true;
+        } catch (IOException exception) {
+            listener.onSocketException(this, exception);
+            close();
+            return false;
+        }
+    }
     public void close() {
         try {
             in.close();

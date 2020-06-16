@@ -162,6 +162,10 @@ public class ChatServer implements ServerSocketThreadListener, SocketThreadListe
                 sendToAllAuthorizedClients(Library.getTypeBroadcast(
                         client.getNickname(), arr[1]));
                 break;
+            case Library.EDIT_NICK:
+                sendToAllAuthorizedClientsNick(Library.getEditNickClient(
+                        arr[1]));
+                break;
             default:
                 client.sendMessage(Library.getMsgFormatError(msg));
         }
@@ -172,6 +176,14 @@ public class ChatServer implements ServerSocketThreadListener, SocketThreadListe
             ClientThread client = (ClientThread) clients.get(i);
             if (!client.isAuthorized()) continue;
             client.sendMessage(msg);
+        }
+    }
+
+    private void sendToAllAuthorizedClientsNick(String msg) {
+        for (int i = 0; i < clients.size(); i++) {
+            ClientThread client = (ClientThread) clients.get(i);
+            if (!client.isAuthorized()) continue;
+            client.sendMessageNick(msg);
         }
     }
 

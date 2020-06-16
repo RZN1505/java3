@@ -6,6 +6,7 @@ public class SqlClient {
 
     private static Connection connection;
     private static Statement statement;
+    private static String nick;
 
     synchronized static void connect() {
         try {
@@ -30,6 +31,20 @@ public class SqlClient {
             ResultSet rs = statement.executeQuery(
                     String.format("select nickname from users where login = '%s' and password = '%s'",
                             login, password));
+            if (rs.next()) {
+                nick = rs.getString("nickname");
+                return nick;
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return null;
+    }
+    synchronized static String setNickname(String nickNew) {
+        try {
+            ResultSet rs = statement.executeQuery(
+                    String.format("update users set nickname = '%s' where login = '%s'",
+                            nickNew, nick));
             if (rs.next()) {
                 return rs.getString("nickname");
             }
