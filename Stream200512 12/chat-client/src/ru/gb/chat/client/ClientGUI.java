@@ -29,10 +29,14 @@ public class ClientGUI extends JFrame implements ActionListener, Thread.Uncaught
     private final JPasswordField tfPassword = new JPasswordField("1234");
     private final JButton btnLogin = new JButton("Login");
 
-    private final JPanel panelBottom = new JPanel(new BorderLayout());
+    //private final JPanel panelBottom = new JPanel(new BorderLayout());
+    private final JPanel panelBottom = new JPanel(new GridLayout(2, 3));
     private final JButton btnDisconnect = new JButton("<html><b>Disconnect</b></html>");
     private final JTextField tfMessage = new JTextField();
     private final JButton btnSend = new JButton("Send");
+
+    private final JTextField nickNameMessage = new JTextField();
+    private final JButton btnNickName= new JButton("Edit nickName");
 
     private final JList<String> userList = new JList<>();
     private boolean shownIoErrors = false;
@@ -65,6 +69,8 @@ public class ClientGUI extends JFrame implements ActionListener, Thread.Uncaught
         tfMessage.addActionListener(this);
         btnLogin.addActionListener(this);
         btnDisconnect.addActionListener(this);
+        nickNameMessage.addActionListener(this);
+        btnNickName.addActionListener(this);
 
         panelTop.add(tfIPAddress);
         panelTop.add(tfPort);
@@ -73,9 +79,11 @@ public class ClientGUI extends JFrame implements ActionListener, Thread.Uncaught
         panelTop.add(tfPassword);
         panelTop.add(btnLogin);
 
-        panelBottom.add(btnDisconnect, BorderLayout.WEST);
-        panelBottom.add(tfMessage, BorderLayout.CENTER);
-        panelBottom.add(btnSend, BorderLayout.EAST);
+        panelBottom.add(btnDisconnect);//, BorderLayout.WEST);
+        panelBottom.add(tfMessage);//, BorderLayout.CENTER);
+        panelBottom.add(btnSend);//, BorderLayout.EAST);
+        panelBottom.add(nickNameMessage);//, BorderLayout.SOUTH);
+        panelBottom.add(btnNickName);//, BorderLayout.EAST);
         panelBottom.setVisible(false);
 
         add(scrollLog, BorderLayout.CENTER);
@@ -98,6 +106,8 @@ public class ClientGUI extends JFrame implements ActionListener, Thread.Uncaught
             connect();
         } else if (src == btnDisconnect) {
             socketThread.close();
+        } else if (src == btnNickName || src == nickNameMessage) {
+            sendNickName();
         } else {
             throw new RuntimeException("Unknown source: " + src);
         }
@@ -118,6 +128,13 @@ public class ClientGUI extends JFrame implements ActionListener, Thread.Uncaught
         tfMessage.setText(null);
         tfMessage.grabFocus();
         socketThread.sendMessage(Library.getTypeBcastClient(msg));
+    }
+
+    private void sendNickName() {
+        String msgNick = nickNameMessage.getText();
+        if ("".equals(msgNick)) return;
+        nickNameMessage.setText(null);
+        socketThread.sendMessage(Library.getTypeBcastClient(msgNick));
     }
 
     private void wrtMsgToLogFile(String msg, String username) {
