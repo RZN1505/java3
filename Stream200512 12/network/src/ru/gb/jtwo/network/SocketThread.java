@@ -28,6 +28,8 @@ public class SocketThread extends Thread {
             listener.onSocketReady(this, socket);
             while (!isInterrupted()) {
                 String msg = in.readUTF();
+                System.out.println("read");
+                System.out.println(msg);
                 listener.onReceiveString(this, socket, msg);
             }
         } catch (IOException exception) {
@@ -39,6 +41,8 @@ public class SocketThread extends Thread {
 
     public boolean sendMessageNick(String msg) {
         try {
+            System.out.println("socketTreadsend");
+            System.out.println(msg);
             out.writeUTF(msg);
             out.flush();
             return true;

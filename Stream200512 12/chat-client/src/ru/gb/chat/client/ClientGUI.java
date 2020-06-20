@@ -1,5 +1,6 @@
 package ru.gb.chat.client;
 
+import com.sun.scenario.effect.impl.sw.java.JSWBlend_SRC_OUTPeer;
 import ru.gb.chat.library.Library;
 import ru.gb.jtwo.network.SocketThread;
 import ru.gb.jtwo.network.SocketThreadListener;
@@ -208,10 +209,14 @@ public class ClientGUI extends JFrame implements ActionListener, Thread.Uncaught
 
     @Override
     public void onReceiveString(SocketThread thread, Socket socket, String msg) {
+        System.out.println("onReceiveString");
+        System.out.println(msg);
         handleMessage(msg);
     }
 
     void handleMessage(String msg) {
+        System.out.println("handleMessage");
+        System.out.println(msg);
         String[] arr = msg.split(Library.DELIMITER);
         String msgType = arr[0];
         switch (msgType) {
