@@ -9,8 +9,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.net.Socket;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -45,6 +44,7 @@ public class ClientGUI extends JFrame implements ActionListener, Thread.Uncaught
 
     private SocketThread socketThread;
     private static final String WINDOW_TITLE = "Chat";
+    private String fileName = "";
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(new Runnable() {
@@ -138,14 +138,32 @@ public class ClientGUI extends JFrame implements ActionListener, Thread.Uncaught
         socketThread.sendMessageNick(Library.getEditNickClient(msgNick));
     }
 
-    private void wrtMsgToLogFile(String msg, String username) {
-        try (FileWriter out = new FileWriter("log.txt", true)) {
+    private void wrtMsgToLogFile(String username, String msg) {
+        System.out.println("wrtMsgToLogFile");
+        try (BufferedWriter out = new BufferedWriter(new FileWriter("log_" + username+ ".txt", true))) {
+            fileName = "log_" + username+ ".txt";
+            System.out.println(fileName );
             out.write(username + ": " + msg + "\n");
             out.flush();
         } catch (IOException e) {
             if (!shownIoErrors) {
                 shownIoErrors = true;
                 showException(Thread.currentThread(), e);
+            }
+        }
+    }
+
+    private void  wrtMsgFromLogFile() {
+        if (new File(fileName).exists()) {
+            try (BufferedReader reader = new BufferedReader(new FileReader(fileName))) {
+                String str;
+                int count = 0;
+                while ((str = reader.readLine()) != null && count <= 100) {
+                    putLog(str);
+                    count++;
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
     }
@@ -187,6 +205,7 @@ public class ClientGUI extends JFrame implements ActionListener, Thread.Uncaught
     @Override
     public void onSocketStart(SocketThread thread, Socket socket) {
         putLog("Start");
+        wrtMsgFromLogFile();
     }
 
     @Override
@@ -195,6 +214,7 @@ public class ClientGUI extends JFrame implements ActionListener, Thread.Uncaught
         panelTop.setVisible(true);
         setTitle(WINDOW_TITLE);
         userList.setListData(new String[0]);
+
     }
 
     @Override
@@ -239,6 +259,7 @@ public class ClientGUI extends JFrame implements ActionListener, Thread.Uncaught
                 break;
             case Library.TYPE_BROADCAST:
                 putLog(DATE_FORMAT.format(Long.parseLong(arr[1])) + ": " + arr[2] + ": " + arr[3] + "\n");
+                wrtMsgToLogFile(arr[2], arr[3]);
                 break;
             case Library.USER_LIST:
                 String usersGet = msg.substring(Library.USER_LIST.length() + Library.DELIMITER.length());
