@@ -118,6 +118,7 @@ public class ChatServer implements ServerSocketThreadListener, SocketThreadListe
 
     @Override
     public synchronized void onReceiveString(SocketThread thread, Socket socket, String msg) {
+        System.out.println("onReceiveStringChatServ");
         ClientThread client = (ClientThread) thread;
         if (client.isAuthorized()) {
             handleAuthMessage(client, msg);
@@ -131,6 +132,7 @@ public class ChatServer implements ServerSocketThreadListener, SocketThreadListe
         // [/auth_request, login, password]
 
         if (arr.length != 3 || !arr[0].equals(Library.AUTH_REQUEST)) {
+            System.out.println("arr.length != ");
             newClient.msgFormatError(msg);
             return;
         }
@@ -155,14 +157,19 @@ public class ChatServer implements ServerSocketThreadListener, SocketThreadListe
     }
 
     private void handleAuthMessage(ClientThread client, String msg) {
+        System.out.println("handleAuthMessage");
+        System.out.println(msg);
         String[] arr = msg.split(Library.DELIMITER);
         String msgType = arr[0];
+        System.out.println(msgType);
+        System.out.println(Library.EDIT_NICK);
         switch (msgType) {
             case Library.CLIENT_MSG_BROADCAST:
                 sendToAllAuthorizedClients(Library.getTypeBroadcast(
-                        client.getNickname(), arr[1]));
+                        SqlClient.getNickname(), arr[1]));
                 break;
             case Library.EDIT_NICK:
+                System.out.println("WTF");
                 sendToAllAuthorizedClientsNick(Library.getEditNickClient(
                         arr[1]));
                 break;
@@ -180,9 +187,14 @@ public class ChatServer implements ServerSocketThreadListener, SocketThreadListe
     }
 
     private void sendToAllAuthorizedClientsNick(String msg) {
+        System.out.println("sendToAllAuthorizedClientsNick");
+        String[] arr = msg.split(Library.DELIMITER);
         for (int i = 0; i < clients.size(); i++) {
             ClientThread client = (ClientThread) clients.get(i);
             if (!client.isAuthorized()) continue;
+            System.out.println("sendToAllAuthorizedClientsNick");
+            System.out.println(arr[1]);
+            SqlClient.setNickname(arr[1]);
             client.sendMessageNick(msg);
         }
     }
