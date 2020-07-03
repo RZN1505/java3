@@ -6,16 +6,23 @@ import ru.gb.jtwo.network.ServerSocketThreadListener;
 import ru.gb.jtwo.network.SocketThread;
 import ru.gb.jtwo.network.SocketThreadListener;
 
+import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Vector;
+import java.util.logging.FileHandler;
+import java.util.logging.Level;
+import java.util.logging.LogManager;
+import java.util.logging.Logger;
+
 
 public class ChatServer implements ServerSocketThreadListener, SocketThreadListener {
 
     ChatServerListener listener;
     private Vector<SocketThread> clients = new Vector<>();
+    private final Logger logger = Logger .getLogger(ChatServer.class.getName());
 
     public ChatServer(ChatServerListener listener) {
         this.listener = listener;
@@ -41,6 +48,16 @@ public class ChatServer implements ServerSocketThreadListener, SocketThreadListe
     }
 
     private void putLog(String msg) {
+        FileHandler fh = null;
+        try {
+            fh = new FileHandler("%tLogApp");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        logger.addHandler(fh);
+        logger.log(Level.INFO, msg);
+
+
         msg = DATE_FORMAT.format(System.currentTimeMillis()) +
                 Thread.currentThread().getName() + ": " + msg;
         listener.onChatServerMessage(msg);
